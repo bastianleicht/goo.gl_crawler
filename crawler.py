@@ -94,4 +94,12 @@ def main():
             time.sleep(random.uniform(1, 3))  # Wartezeit zwischen 1 und 3 Sekunden
 
     except Error as e:
+        print(f"Error connecting to MySQL: {e}")
 
+    finally:
+        if connection.is_connected():
+            connection.close()
+
+
+if __name__ == "__main__":
+    main()
