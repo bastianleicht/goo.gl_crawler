@@ -3,12 +3,15 @@ from mysql.connector import Error
 import requests
 import random
 import string
+import time
+
 
 # Funktion zur Generierung einer zufälligen URL-Endung
 def generate_random_suffix(min_length=3, max_length=7):
     """Generiert einen zufälligen Slug mit variabler Länge."""
     length = random.randint(min_length, max_length)
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
+
 
 # Funktion zur Durchführung der Webabfrage und Ermittlung der Weiterleitungsadresse
 def get_redirect_url(base_url, suffix):
@@ -19,6 +22,7 @@ def get_redirect_url(base_url, suffix):
     except requests.RequestException as e:
         print(f"Error fetching URL: {url} - {e}")
         return None
+
 
 # Funktion zum Erstellen der MySQL-Datenbank und der Tabelle
 def create_database(connection):
@@ -35,6 +39,7 @@ def create_database(connection):
     except Error as e:
         print(f"Error creating database table: {e}")
 
+
 # Funktion zum Einfügen der URLs in die MySQL-Datenbank
 def insert_into_database(connection, slug, original_url, redirect_url):
     try:
@@ -48,10 +53,10 @@ def insert_into_database(connection, slug, original_url, redirect_url):
     except Error as e:
         print(f"Error inserting into database: {e}")
 
+
 # Hauptskript
 def main():
     base_url = "https://goo.gl"
-    num_urls = 1000  # Anzahl der zu generierenden URLs
 
     # MySQL-Verbindungsdetails
     config = {
@@ -68,7 +73,7 @@ def main():
         # Datenbank und Tabelle erstellen
         create_database(connection)
 
-        for _ in range(num_urls):
+        while True:
             suffix = generate_random_suffix()
             slug = suffix  # Verwenden des Suffix als Slug
             original_url = f"{base_url}/{suffix}"
@@ -80,12 +85,16 @@ def main():
             else:
                 print(f"Original URL: {original_url} has no redirection.")
 
+            # Wartezeit einfügen, um Serverüberlastung zu vermeiden
+            time.sleep(random.uniform(1, 3))  # Wartezeit zwischen 1 und 3 Sekunden
+
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
 
     finally:
         if connection.is_connected():
             connection.close()
+
 
 if __name__ == "__main__":
     main()
