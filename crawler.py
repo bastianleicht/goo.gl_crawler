@@ -55,6 +55,18 @@ def insert_into_database(connection, slug, original_url, redirect_url):
         print(f"Error inserting into database: {e}")
 
 
+# Funktion zum Überprüfen, ob der Slug bereits existiert
+def slug_exists(connection, slug):
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT slug FROM redirects WHERE slug = %s", (slug,))
+        result = cursor.fetchone()
+        return result is not None  # Wenn es ein Ergebnis gibt, existiert der Slug bereits
+    except Error as e:
+        print(f"Error checking slug existence: {e}")
+        return False
+
+
 # Hauptskript
 def main():
     base_url = "https://goo.gl"
@@ -79,8 +91,15 @@ def main():
         create_database(connection)
 
         while True:
+            # Generiere neuen Slug und prüfe, ob dieser bereits existiert
             suffix = generate_random_suffix()
             slug = suffix  # Verwenden des Suffix als Slug
+
+            if slug_exists(connection, slug):
+                print(f"Slug {slug} already exists in the database. Skipping.")
+                continue  # Neuen Slug generieren
+
+            # Original URL erstellen
             original_url = f"{base_url}/{suffix}"
             redirect_url = get_redirect_url(base_url, suffix)
 
