@@ -1,0 +1,10 @@
+{
+    "apps": [{
+        "name": "goo.gl crawler",
+        "script": "crawler.py",
+        "instances": "10",
+        "wait_ready": false,
+        "autorestart": true,
+        "max_restarts": 5
+    }]
+}

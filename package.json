@@ -1,0 +1,16 @@
+{
+  "name": "goo.gl_crawler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2 start crawler.config.json",
+    "stop": "pm2 stop crawler.config.json",
+    "logs_all": "pm2 logs all"
+  },
+  "author": "Bastian Leicht",
+  "license": "ISC",
+  "dependencies": {
+    "pm2": "^5.4.2"
+  }
+}
