@@ -4,6 +4,7 @@ import requests
 import random
 import string
 import time
+import configparser
 
 
 # Funktion zur Generierung einer zufälligen URL-Endung
@@ -58,17 +59,21 @@ def insert_into_database(connection, slug, original_url, redirect_url):
 def main():
     base_url = "https://goo.gl"
 
-    # MySQL-Verbindungsdetails
-    config = {
-        'host': 'host1.bastianleicht.de',
-        'user': 'c1scraper_user',
-        'password': 'vbpT@B6Z5',
-        'database': 'c1googl_scraper'
+    # Konfigurationsdatei einlesen
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    # MySQL-Verbindungsdetails aus der config.ini
+    db_config = {
+        'host': config.get('mysql', 'host'),
+        'user': config.get('mysql', 'user'),
+        'password': config.get('mysql', 'password'),
+        'database': config.get('mysql', 'database')
     }
 
     try:
         # Verbindung zur MySQL-Datenbank herstellen
-        connection = mysql.connector.connect(**config)
+        connection = mysql.connector.connect(**db_config)
 
         # Datenbank und Tabelle erstellen
         create_database(connection)
@@ -89,12 +94,4 @@ def main():
             time.sleep(random.uniform(1, 3))  # Wartezeit zwischen 1 und 3 Sekunden
 
     except Error as e:
-        print(f"Error connecting to MySQL: {e}")
 
-    finally:
-        if connection.is_connected():
-            connection.close()
-
-
-if __name__ == "__main__":
-    main()
