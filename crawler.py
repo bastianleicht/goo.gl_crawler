@@ -98,6 +98,9 @@ def main():
         # Verbindung zur MySQL-Datenbank herstellen
         connection = mysql.connector.connect(**db_config)
 
+        if connection.is_connected():
+            print("Connected to MySQL database")
+
         # Datenbank und Tabelle erstellen
         create_database(connection)
 
@@ -121,7 +124,7 @@ def main():
                 print(f"Original URL: {original_url} has no redirection.")
 
             # Wartezeit einfügen, um Serverüberlastung zu vermeiden
-            time.sleep(random.uniform(1, 3))  # Wartezeit zwischen 1 und 3 Sekunden
+            time.sleep(random.uniform(1, 2))  # Wartezeit zwischen 1 und 3 Sekunden
 
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
