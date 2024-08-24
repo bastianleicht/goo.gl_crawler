@@ -18,8 +18,19 @@ def generate_random_suffix(min_length=3, max_length=7):
 def get_redirect_url(base_url, suffix):
     url = f"{base_url}/{suffix}"
     try:
-        response = requests.head(url, allow_redirects=True)
-        return response.url if response.url != url else None
+        response = requests.head(url, allow_redirects=False, timeout=5)
+
+        # Prüfe, ob die Antwort einen 302-Statuscode hat
+        if response.status_code == 302 and 'Location' in response.headers:
+            # Extrahiere die Weiterleitungs-URL aus dem 'Location'-Header
+            redirect_url = response.headers['Location']
+            # Wenn die Redirect-URL relativ ist, füge die Basis-URL hinzu
+            if redirect_url.startswith('/'):
+                redirect_url = f"{base_url}{redirect_url}"
+            return redirect_url
+        else:
+            # Keine Weiterleitung oder kein 302-Statuscode, Rückgabe von None
+            return None
     except requests.RequestException as e:
         print(f"Error fetching URL: {url} - {e}")
         return None
